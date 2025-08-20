@@ -9,7 +9,8 @@ export const mapService = {
 }
 
 // TODO: Enter your API Key
-const API_KEY = window.env.GOOGLE_MAPS_API_KEY
+//const API_KEY = window.env.GOOGLE_MAPS_API_KEY
+const API_KEY = '' 
 var gMap
 var gMarker
 
@@ -36,7 +37,7 @@ function lookupAddressGeo(geoOrAddress) {
     // const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${address}`
     // const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=40.714224,-73.961452`
 
-    console.log('geoOrAddress: ', geoOrAddress)
+    //console.log('geoOrAddress: ', geoOrAddress)
 
     var url = `https://maps.googleapis.com/maps/api/geocode/json?key=${API_KEY}&`
     url += (geoOrAddress.lat) ? `latlng=${geoOrAddress.lat},${geoOrAddress.lng}` :
