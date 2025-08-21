@@ -102,20 +102,52 @@ function onSearchAddress(ev) {
 function onAddLoc(geo) {
     const elDialog = document.querySelector('.add-edit-loc')
     const elDialogTextInput = document.querySelector('.dialog-input-text')
+    elDialogTextInput.hidden = false
+    elDialogTextInput.required = true
     elDialogTextInput.value = geo.address || 'Just a place'
-    elDialog.showModal()
-    
-    //const locName = prompt('Loc name', geo.address || 'Just a place')
-    if (!locName) return
 
-    const loc = {
-        name: locName,
-        rate: +prompt(`Rate (1-5)`, '3'),
-        geo
+    elDialog.dataset.payload = JSON.stringify({geo: geo})
+    elDialog.showModal()
+}
+
+function onUpdateLoc(locId) {
+    const elDialog = document.querySelector('.add-edit-loc')
+    const elDialogTextInput = document.querySelector('.dialog-input-text')
+    elDialogTextInput.hidden = true
+    elDialogTextInput.required = false
+    locService.getById(locId)
+        .then(loc => {elDialog.dataset.payload = JSON.stringify(loc)})
+        .then(elDialog.showModal())
+}
+
+function onDialogSave() {
+    const elDialog = document.querySelector('.add-edit-loc')
+    const elDialogTextInput = document.querySelector('.dialog-input-text')
+    const elDialogRateInput = document.querySelector('.dialog-input-rate')
+    let loc = {}
+
+    //in case of new loc
+    if (!JSON.parse(elDialog.dataset.payload).name){
+        const geo = JSON.parse(elDialog.dataset.payload).geo
+        delete elDialog.dataset.payload
+        loc = {
+            name: elDialogTextInput.value,
+            rate: elDialogRateInput.value,
+            geo: geo
+        }
     }
+
+    //in case of update 
+    else {loc = {...JSON.parse(elDialog.dataset.payload), rate: elDialogRateInput.value}}
+    
+    
+    console.log('elDialogRateInput.value: ', elDialogRateInput.value)
+    console.log('loc: ', loc)
+
+
     locService.save(loc)
         .then((savedLoc) => {
-            flashMsg(`Added Location (id: ${savedLoc.id})`)
+            flashMsg(`Saved Location (id: ${savedLoc.id})`)
             utilService.updateQueryParams({ locId: savedLoc.id })
             loadAndRenderLocs()
         })
@@ -123,10 +155,6 @@ function onAddLoc(geo) {
             console.error('OOPs:', err)
             flashMsg('Cannot add location')
         })
-}
-
-function onDialogSave() {
-    console.log('submited')
 }
 
 function loadAndRenderLocs() {
@@ -156,26 +184,6 @@ function onPanToUserPos() {
 
 function displayDistances(userPos) {
     window.gUserPos = userPos
-}
-
-function onUpdateLoc(locId) {
-    locService.getById(locId)
-        .then(loc => {
-            const rate = prompt('New rate?', loc.rate)
-            if (rate && rate !== loc.rate) {
-                loc.rate = rate
-                locService.save(loc)
-                    .then(savedLoc => {
-                        flashMsg(`Rate was set to: ${savedLoc.rate}`)
-                        loadAndRenderLocs()
-                    })
-                    .catch(err => {
-                        console.error('OOPs:', err)
-                        flashMsg('Cannot update location')
-                    })
-
-            }
-        })
 }
 
 function onSelectLoc(locId) {

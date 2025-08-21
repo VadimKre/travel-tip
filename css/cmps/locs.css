@@ -35,6 +35,12 @@
     height: 100vh;
 }
 
+/* .add-edit-loc {
+    position: relative;
+    left: 0%;
+    top: 0%;
+} */
+
 .form-search {
     display: block;
     text-align: end;
