@@ -41,6 +41,7 @@ function renderLocs(locs) {
         <li class="loc ${className}" data-id="${loc.id}">
             <h4>  
                 <span>${loc.name}</span>
+                ${window.userPos ? `<span>Distance: ${utilService.getDistance(window.userPos, {lat: loc.geo.lat, lng: loc.geo.lng}, 'K')} KM</span>`: '' }
                 <span title="${loc.rate} stars">${'★'.repeat(loc.rate)}</span>
             </h4>
             <p class="muted">
@@ -131,7 +132,9 @@ function onPanToUserPos() {
     mapService.getUserPosition()
         .then(latLng => {
             mapService.panTo({ ...latLng, zoom: 15 })
-            unDisplayLoc()
+            //unDisplayLoc()
+            displayDistances(latLng)
+
             loadAndRenderLocs()
             flashMsg(`You are at Latitude: ${latLng.lat} Longitude: ${latLng.lng}`)
         })
@@ -139,6 +142,10 @@ function onPanToUserPos() {
             console.error('OOPs:', err)
             flashMsg('Cannot get your position')
         })
+}
+
+function displayDistances(userPos) {
+    window.userPos = userPos
 }
 
 function onUpdateLoc(locId) {
@@ -180,6 +187,7 @@ function displayLoc(loc) {
     const el = document.querySelector('.selected-loc')
     el.querySelector('.loc-name').innerText = loc.name
     el.querySelector('.loc-address').innerText = loc.geo.address
+    el.querySelector('.loc-distance').innerText = (window.userPos !== undefined) ? 'Distance: ' +  utilService.getDistance(window.userPos, {lat: loc.geo.lat, lng: loc.geo.lng}, 'K') + ' KM' : ''
     el.querySelector('.loc-rate').innerHTML = '★'.repeat(loc.rate)
     el.querySelector('[name=loc-copier]').value = window.location
     el.classList.add('show')
