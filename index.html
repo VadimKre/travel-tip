@@ -9,6 +9,24 @@
 </head>
 
 <body>
+
+    <dialog class="add-edit-loc">
+        <form method="dialog">
+            <input class="dialog-input-text" type="text" placeholder="Name" required> </input>
+            <label>
+                Rating
+                <select class="dialog-input-rate" name="rating">
+                    <option value="5">5</option>
+                    <option value="4">4</option>
+                    <option value="3">3</option>
+                    <option value="2">2</option>
+                    <option value="1">1</option>
+                </select>       
+            </label>
+            <button type="submit" onclick="app.onDialogSave()">Save</button>     
+        </form>
+    
+    </dialog>
     <header>
         <h1>TravelTip</h1>
         <section class="selected-loc">
@@ -61,6 +79,11 @@
                     <h3>Statistics</h3>
                     <div class="loc-stats-rate">
                         <h4>By rate:</h4>
+                        <div class="pie"></div>
+                        <ul class="legend"></ul>
+                    </div>
+                    <div class="loc-stats-updates">
+                        <h4>By Updates:</h4>
                         <div class="pie"></div>
                         <ul class="legend"></ul>
                     </div>

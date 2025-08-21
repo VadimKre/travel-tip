@@ -9,6 +9,7 @@ window.onload = onInit
 window.app = {
     onRemoveLoc,
     onUpdateLoc,
+    onDialogSave,
     onSelectLoc,
     onPanToUserPos,
     onSearchAddress,
@@ -41,7 +42,7 @@ function renderLocs(locs) {
         <li class="loc ${className}" data-id="${loc.id}">
             <h4>  
                 <span>${loc.name}</span>
-                ${window.userPos ? `<span>Distance: ${utilService.getDistance(window.userPos, {lat: loc.geo.lat, lng: loc.geo.lng}, 'K')} KM</span>`: '' }
+                ${window.gUserPos ? `<span>Distance: ${utilService.getDistance(window.gUserPos, {lat: loc.geo.lat, lng: loc.geo.lng}, 'K')} KM</span>`: '' }
                 <span title="${loc.rate} stars">${'★'.repeat(loc.rate)}</span>
             </h4>
             <p class="muted">
@@ -99,7 +100,12 @@ function onSearchAddress(ev) {
 }
 
 function onAddLoc(geo) {
-    const locName = prompt('Loc name', geo.address || 'Just a place')
+    const elDialog = document.querySelector('.add-edit-loc')
+    const elDialogTextInput = document.querySelector('.dialog-input-text')
+    elDialogTextInput.value = geo.address || 'Just a place'
+    elDialog.showModal()
+    
+    //const locName = prompt('Loc name', geo.address || 'Just a place')
     if (!locName) return
 
     const loc = {
@@ -117,6 +123,10 @@ function onAddLoc(geo) {
             console.error('OOPs:', err)
             flashMsg('Cannot add location')
         })
+}
+
+function onDialogSave() {
+    console.log('submited')
 }
 
 function loadAndRenderLocs() {
@@ -145,7 +155,7 @@ function onPanToUserPos() {
 }
 
 function displayDistances(userPos) {
-    window.userPos = userPos
+    window.gUserPos = userPos
 }
 
 function onUpdateLoc(locId) {
@@ -187,7 +197,7 @@ function displayLoc(loc) {
     const el = document.querySelector('.selected-loc')
     el.querySelector('.loc-name').innerText = loc.name
     el.querySelector('.loc-address').innerText = loc.geo.address
-    el.querySelector('.loc-distance').innerText = (window.userPos !== undefined) ? 'Distance: ' +  utilService.getDistance(window.userPos, {lat: loc.geo.lat, lng: loc.geo.lng}, 'K') + ' KM' : ''
+    el.querySelector('.loc-distance').innerText = (window.gUserPos !== undefined) ? 'Distance: ' +  utilService.getDistance(window.gUserPos, {lat: loc.geo.lat, lng: loc.geo.lng}, 'K') + ' KM' : ''
     el.querySelector('.loc-rate').innerHTML = '★'.repeat(loc.rate)
     el.querySelector('[name=loc-copier]').value = window.location
     el.classList.add('show')
@@ -274,6 +284,10 @@ function renderLocStats() {
     locService.getLocCountByRateMap().then(stats => {
         handleStats(stats, 'loc-stats-rate')
     })
+    locService.getLocCountByUpdatesMap().then(stats => {
+        handleStats(stats, 'loc-stats-updates')
+    })
+
 }
 
 function handleStats(stats, selector) {
